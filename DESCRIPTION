@@ -1,0 +1,19 @@
+Package: features
+Type: Package
+Title: Serves spatial feature datasets
+Version: 0.0.1
+Author: Ben Tupper <btupper@bigelow.org>
+Maintainer: Ben Tupper <btupper@bigelow.org>
+Description: Serving spatial feature datasets.
+URL: https://github.com/BigelowLab/features
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.2.0)
+Imports:
+  rlang,
+  dplyr,
+  sf,
+  readr,
+  uuid
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
