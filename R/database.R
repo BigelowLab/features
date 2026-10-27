@@ -38,21 +38,24 @@ append_database = function(x,
                            check = c("unique", "none")[1],
                            strict_match = TRUE,
                            path = features_path()){
+  
   orig = read_database(filename = filename, path = path)
+  x = dplyr::select(x, -dplyr::any_of("feature"))
+  
   if (isTRUE(strict_match)){
     if(!identical(colnames(x), colnames(orig))) {
-      stop("names of x and original do not match")
+      stop("names of x and on-disk database do not match")
     }
     xtypes = sapply(x, typeof)
     origtypes = sapply(orig, typeof)
     if(!identical(xtypes, origtypes)) {
-      stop("data types of x and original do not match")
+      stop("data types of x and on-disk database do not match")
     }
   }
   
   if (tolower(check[1]) == "unique"){
     if(any(x$id %in% orig$id)){
-      stop("ids in x and orig must be unique")
+      stop("ids in x and on-disk database must be unique")
     }
   }
   
