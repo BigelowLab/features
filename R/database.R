@@ -10,20 +10,12 @@ read_database = function(filename = "database",
                          path = features_path()){
   file = file.path(path, filename)
   if (!file.exists(file)){
-    x = dplyr::tibble(
-      id = NA_character_,
-      date = Sys.Date(),
-      name = NA_character_,
-      longname = NA_character_,
-      type = NA_character_,
-      ref = NA_character_,
-      url = NA_character_,
-      doi = NA_character_)
+    x = template_database(n = 1)
     if (add_feature) x = dplyr::mutate(x, feature = list())  
   } else {
     x = readr::read_csv(file,
-                  col_types = "cDcccccc")
-    if (add_feature) x = load_feature(x, path = path)
+                  col_types = "cDccccccnnnn")
+    if (add_feature) x = load_feature(x, path = file.path(path, "data"))
   }
   
   return(x)
@@ -34,7 +26,7 @@ read_database = function(filename = "database",
 write_database = function(x, 
                           filename = "database",
                           path = features_path()){
-  readr::write_csv(x,
+  readr::write_csv(dplyr::select(x, -dplyr::any_of("feature")),
                    file.path(path, filename))
 }
 
@@ -85,7 +77,11 @@ template_record = function(n = 1){
     type = NA_character_,
     ref = NA_character_,
     url = NA_character_,
-    doi = NA_character_)
+    doi = NA_character_,
+    xmin = NA_real_,
+    xmax = NA_real_,
+    ymin = NA_real_,
+    ymax = NA_real_)
   if (n > 1) x = dplyr::slice(x, rep(1,n))
   return(x)
 }
@@ -100,3 +96,49 @@ new_record = function(n = 1){
                   id = uuid::UUIDgenerate(n = n, output = "string"))
 
 }
+
+#' Determine the feature type
+#'
+#' @export
+#' @param x spatial object in the sf family
+#' @return character string of the feature type
+feature_type = function(x){
+  klass = sf::st_geometry(x[1]) |>
+    class()
+  sub("sfc_", "", klass[1])
+}
+
+#' Add a new record
+#' 
+#' @export
+#' @param name chr the programmable short name (required, no spaces, etc)
+#' @param longname chr the longer display name (required)
+#' @param x spatial object (required, must be writeable by [sf::write_sf()])
+#' @param ref chr, optional reference info
+#' @param url chr, optional URL
+#' @param doi chr, optional URI
+
+add_feature = function(name, longname, x,
+                       type = feature_type(x),
+                       ref = NA_character_,
+                       url = NA_character_,
+                       doi = NA_character_){
+  if (any(missing(name), missing(longname), missing(x))){
+    stop("name, logname and x are required")
+  }
+  bb = sf::st_bbox(x)
+  r = new_record() |>
+    dplyr::mutate(name = name[1],
+                  longname = longname[1],
+                  type = type,
+                  ref = ref[1],
+                  url = url[1],
+                  doi = doi[1],
+                  xmin = bb$xmin,
+                  xmax = bb$xmax,
+                  ymin = bb$ymin,
+                  ymax = bb$ymax)
+  db = append_database(r)
+  write_feature(x,r)
+}
+                  
