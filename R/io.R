@@ -40,3 +40,12 @@ load_feature = function(x,
   x |>
     dplyr::mutate(feature = read_feature(x, path = path))
 }
+
+#' Import a feature
+#' 
+#' @export
+#' @param filename chr, the name of the file to import
+#' @return data frame of spatial data
+import_feature = function(filename){
+  sf::read_sf(filename[1])
+}

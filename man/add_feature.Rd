@@ -19,7 +19,8 @@ add_feature(
 
 \item{longname}{chr the longer display name (required)}
 
-\item{x}{spatial object (required, must be writeable by \code{\link[sf:st_write]{sf::write_sf()}})}
+\item{x}{spatial object (required, must be writeable by \code{\link[sf:st_write]{sf::write_sf()}}) or
+the file path to ta file that can be read by \code{\link[sf:st_read]{sf::read_sf()}}}
 
 \item{ref}{chr, optional reference info}
 

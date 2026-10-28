@@ -3,6 +3,7 @@
 export(add_feature)
 export(feature_type)
 export(features_path)
+export(import_feature)
 export(load_feature)
 export(read_database)
 export(read_feature)

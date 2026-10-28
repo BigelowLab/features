@@ -100,6 +100,35 @@ new_record = function(n = 1){
 
 }
 
+#' Remove a feature
+#'
+#' This is destructive so use with care - not exported.
+#'  
+#' @param x a data frame database of one or more rows to remove
+#' @param path chr, data path
+#' @return the updated database
+remove_feature = function(x,
+                          path = features_path()){
+  
+  orig = read_database(path)
+  x = dplyr::select(x, -dplyr::any_of("feature"))
+  
+  toss = orig$id %in% x$id
+  keep = !toss
+  
+  keepdb = dplyr::filter(orig, keep)
+  
+  toss_files = file.path(path, "data",
+                         sprintf("%s.gpkg", x$id))
+  ok = file.remove(toss_files)
+  if (all(ok)){
+    stop("unable to remove files - please check permissions")
+  }
+  
+  write_database(keepdb, path)
+}
+
+
 #' Determine the feature type
 #'
 #' @export
@@ -116,7 +145,8 @@ feature_type = function(x){
 #' @export
 #' @param name chr the programmable short name (required, no spaces, etc)
 #' @param longname chr the longer display name (required)
-#' @param x spatial object (required, must be writeable by [sf::write_sf()])
+#' @param x spatial object (required, must be writeable by [sf::write_sf()]) or 
+#'   the file path to ta file that can be read by [sf::read_sf()]
 #' @param ref chr, optional reference info
 #' @param url chr, optional URL
 #' @param doi chr, optional URI
@@ -129,19 +159,31 @@ add_feature = function(name, longname, x,
   if (any(missing(name), missing(longname), missing(x))){
     stop("name, logname and x are required")
   }
+  
+  if (inherits(x, "character") && file.exists(x)) {
+    x = import_feature(x)
+  } else {
+    stop("input x must be an sf object or a filename (and the file must exist)")
+  }
+  
+  
   bb = sf::st_bbox(x)
+  z = list(name, longname, type, ref, url, doi)
+  
   r = new_record() |>
-    dplyr::mutate(name = name[1],
-                  longname = longname[1],
-                  type = type,
-                  ref = ref[1],
-                  url = url[1],
-                  doi = doi[1],
+    dplyr::mutate(name = z[[1]],
+                  longname = z[[2]],
+                  type = z[[3]],
+                  ref = z[[4]],
+                  url = z[[5]],
+                  doi = z[[6]],
                   xmin = bb$xmin,
                   xmax = bb$xmax,
                   ymin = bb$ymin,
                   ymax = bb$ymax)
+  
   db = append_database(r)
   write_feature(x,r)
+  r
 }
                   
