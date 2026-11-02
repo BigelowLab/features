@@ -1,6 +1,6 @@
 ---
 title: "features"
-output: html_document
+output: github_document
 ---
 
 A lightweight database of spatial features. Following this conceptual design.
@@ -57,4 +57,14 @@ You can also attach features to a database table as a new list column.
 ```{r}
 y = load_feature(db)
 y
+```
+
+# Add a new feature
+
+New features results in additional rows in the database.  At a minumum you must provided a *name* (programmable! no spaces! short!), a *long name* (for displays) and a *spatial object* either an `sf` object or a file path to an object that can be read by `sf::read_sf()`.  You can also provides a reference, doi, etc.
+
+```
+add_feature("casco_bay", "Casco Bay", path_to_file,
+            ref = "Courtesy Casco Bay Yacht Club",
+            url = "http://www.cbyc.org")
 ```

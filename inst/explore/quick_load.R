@@ -4,14 +4,14 @@ suppressPackageStartupMessages({
   library(dplyr)
 })
 
-x = read_database(add_feature = TRUE)
+x = read_database()
 
 
-file = "/mnt/s1/projects/ecocast/coredata/features/temp/Maine_Ecoregions.geojson"
-name = "maine_ecoregions"
-longname = "Maine Ecoregions"
+file = "/mnt/s1/projects/ecocast/coredata/features/temp/Maine_Boat_Launches_GeoLibrary.geojson"
+name = "maine_boat_launches"
+longname = "Maine Boat Launches"
 ref = "Maine Office of GIS"
-url = "https://maine.hub.arcgis.com/maps/maine::maine-ecoregions/about"
+url = "https://mainegeolibrary-maine.hub.arcgis.com/datasets/maine::maine-boat-launches-geolibrary/about"
 
 r = add_feature(name, longname, file,
                 ref = ref,

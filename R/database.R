@@ -150,7 +150,7 @@ feature_type = function(x){
 #' @param ref chr, optional reference info
 #' @param url chr, optional URL
 #' @param doi chr, optional URI
-
+#' @return a new database record
 add_feature = function(name, longname, x,
                        type = feature_type(x),
                        ref = NA_character_,
@@ -162,11 +162,12 @@ add_feature = function(name, longname, x,
   
   if (inherits(x, "character") && file.exists(x)) {
     x = import_feature(x)
+  } else if (inherits(x, c("sf", "sfc"))){
+    # nothing to do here!
   } else {
     stop("input x must be an sf object or a filename (and the file must exist)")
   }
-  
-  
+
   bb = sf::st_bbox(x)
   z = list(name, longname, type, ref, url, doi)
   
